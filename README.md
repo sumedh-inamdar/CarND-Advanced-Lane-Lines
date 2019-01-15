@@ -30,16 +30,16 @@ The process can be summarized as follows:
 3. feed both object and image points into the OpenCV function "calibrateCamera" to produce the camera matrix and distortion coefficients.
 
 See sample calibration image original (left) and undistorted (right) below:  
-<img src="./camera_cal/calibration2.jpg" height="300">
-<img src="./camera_cal_undist/calibration2.jpg" height="300">
+<img src="./camera_cal/calibration2.jpg" height="240">
+<img src="./camera_cal_undist/calibration2.jpg" height="240">
 
 ### Pipeline (single images)
 
 #### 1. Provide an example of a distortion-corrected image.
 
 See sample original (left) and distortion corrected image (right) below:  
-<img src="./test_images/test4.jpg" height="300">
-<img src="./output_images/test4_undist.jpg" height="300">
+<img src="./test_images/test4.jpg" height="240">
+<img src="./output_images/test4_undist.jpg" height="240">
 
 Although the two images appear similar, the effects of distortion correction is more apparent at the edges of images, especially if you look at the white vehicle to the right.
 
@@ -58,11 +58,11 @@ The next step is to take the undistorted image and apply a sequence of steps to 
       sobelDir == 1))) | ((sChan_binary == 1) & (hChan_binary == 1))] = 1`  
 
 See sample undistorted original images (left) and thresholded binary images (right) below:  
-<img src="./test_images/test3.jpg" height="300">
-<img src="./output_images/test3_binaryOut.jpg" height="300">  
+<img src="./test_images/test3.jpg" height="240">
+<img src="./output_images/test3_binaryOut.jpg" height="240">  
 <br>
-<img src="./test_images/test2.jpg" height="300">
-<img src="./output_images/test2_binaryOut.jpg" height="300">  
+<img src="./test_images/test2.jpg" height="240">
+<img src="./output_images/test2_binaryOut.jpg" height="240">  
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
@@ -71,11 +71,11 @@ See function `def warpPerspective(image)` in `helpers.py` (lines 167-187)
 In order to accurately measure the lane curvature, a perspective transform must be performed to convert the front facing road image to a top-down view. This is done by using the OpenCV function `cv2.getPerspectiveTransform(src, dst)` which takes in an array of source (`src`) and destination (`pts`) and returns the transformation matrix (`M`). The function `cv2.warpPerspective` takes `M` as an input and applies it to the binary thresholded image to return the warped image as seen below.  
 
 See sample original binary thresholded images (left) and perspective transformed images (right) below:  
-<img src="./output_images/test3_binaryOut.jpg" height="300">
-<img src="./output_images/test3_warpBinary.jpg" height="300">  
+<img src="./output_images/test3_binaryOut.jpg" height="240">
+<img src="./output_images/test3_warpBinary.jpg" height="240">  
 <br>
-<img src="./output_images/test2_binaryOut.jpg" height="300">
-<img src="./output_images/test2_warpBinary.jpg" height="300">
+<img src="./output_images/test2_binaryOut.jpg" height="240">
+<img src="./output_images/test2_warpBinary.jpg" height="240">
 
 
 *Note: The src points are selected by manually locating points along the parallel lane lines in the front facing image and verifying them by drawing it back onto the original and transformed image as seen below.*
@@ -93,8 +93,8 @@ dst = np.float32(
     [(img_size[0] * 3 / 4), 0]])
   ```
 See sample original image with `src` points (left) and `dst` points in perspective transformed image (right):  
-  <img src="./output_images/straight_lines1_unwarpedOG.jpg" height="300">
-  <img src="./output_images/straight_lines1_warpOG.jpg" height="300">  
+  <img src="./output_images/straight_lines1_unwarpedOG.jpg" height="240">
+  <img src="./output_images/straight_lines1_warpOG.jpg" height="240">  
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.  
 
@@ -106,11 +106,11 @@ The first function (find_lane_pixels) is called if either lane lane was not dete
 
 A series of stacked rectangles (or windows) are generated from the image base and each of the windows are iterated through and scanned for nonzero pixels. If the number of nonzero pixels exceeds the threshold `mixpix = 50` per window, the window is recentered according to the mean.  
 
-<img src="./output_images/test3_slideWindow.jpg" height="300">
+<img src="./output_images/test3_slideWindow.jpg" height="480">
 
 If the lane was detected in the prior frame, The second function (searchExistingLanes) is called. Rather than start the search from scratch, this function looks for nonzero pixels within a +/- margin around the previous polynomial fit line which can save computing time/energy.   
 
-<img src="./output_images/warped_example_prevPoly.jpg" height="300">
+<img src="./output_images/warped_example_prevPoly.jpg" width="854">
 
 The function determines a line is detected if the number for pixels found per lane exceeds the threshold defined in the variable `minPixDetect` (line 362 in helpers.py)
 
@@ -119,7 +119,7 @@ The captured x and y pixels are then fitted to 2nd order polynomial curve using 
 To determine the "best fit" line, an exponential moving average (EMA) filter is applied to the previous 10 frames using the function `def EMAcalc`. This filter gives highest weight to new frames and exponentially decreasing weight to older frames. See figure below:  
 *Reference: https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average*  
 
-<img src="./EMAweights.jpg" height="300">
+<img src="./EMAweights.jpg" width="854">
 
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
@@ -141,7 +141,7 @@ Both the radius and offset text information are added to the final image in the 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.  
 
 The lane area visualization and inverse warp perspective can be found towards the end of the function `def fit_polynomial` (lines 437 - 455). A polygon is formed with the left and right lane boundaries and filled green using the `fillPoly` function in OpenCV. The image is then warped back using `Minv`, the inverse perspective matrix and added back onto the original undistorted road image. The end result can be seen below:  
-<img src="./output_images/test4_finalResult.jpg" height="300">
+<img src="./output_images/test4_finalResult.jpg" height="480">
 
 ---
 
